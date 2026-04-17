@@ -4,6 +4,14 @@ An intelligent endpoint behavior analysis and threat detection system designed f
 
 ![SentinelWatch Dashboard](frontend/assets/interface.png)
 
+## Description
+
+SentinelWatch is a full-stack cybersecurity platform that I developed to showcase practical skills in threat detection, system monitoring, and security analytics. The project addresses a critical challenge in modern cybersecurity: detecting sophisticated threats that bypass traditional signature-based detection by analyzing system behavior in real-time.
+
+The platform continuously monitors endpoint activity including running processes, network connections, and file operations. Using an Isolation Forest machine learning algorithm, it establishes behavioral baselines during normal operation and identifies statistical anomalies that may indicate malware, intrusions, or insider threats. A multi-factor risk scoring engine evaluates suspicious patterns including encoded PowerShell commands, C2 communication signatures, and unusual file access to generate actionable security alerts.
+
+This project demonstrates proficiency across the security engineering stack: Python backend development with FastAPI, real-time data processing with WebSockets, machine learning implementation with scikit-learn, and modern frontend development with vanilla JavaScript and Canvas visualization. The dark-themed interface supports multiple languages and provides security analysts with an intuitive dashboard for threat investigation and incident response.
+
 ## Overview
 
 SentinelWatch is a production-ready cybersecurity platform that combines real-time system monitoring, machine learning-based anomaly detection, and comprehensive risk scoring to protect endpoints against evolving threats. The system monitors processes, network connections, and file operations while analyzing behavioral patterns to identify suspicious activities.

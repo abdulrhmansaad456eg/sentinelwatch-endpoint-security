@@ -2,7 +2,7 @@
 
 An intelligent endpoint behavior analysis and threat detection system designed for real-time security monitoring. Built for the GKS Smart Security program application.
 
-![SentinelWatch Dashboard](frontend/assets/screenshot_dashboard.png)
+![SentinelWatch Dashboard](frontend/assets/interface.png)
 
 ## Overview
 
@@ -232,16 +232,12 @@ Language selection is available in the sidebar and persists during the session.
 ## Screenshots
 
 ### Dashboard
-![Dashboard](frontend/assets/screenshot_dashboard.png)
+![Dashboard](frontend/assets/interface.png)
 *Real-time security overview with threat distribution and resource monitoring*
 
-### Process Analysis
-![Processes](frontend/assets/screenshot_processes.png)
-*Process listing with anomaly indicators and risk scores*
+## Additional Screenshots
 
-### Security Events
-![Events](frontend/assets/screenshot_events.png)
-*Event timeline with severity classification and investigation details*
+*More screenshots available in the live demo at `http://localhost:8000`*
 
 ## Troubleshooting
 

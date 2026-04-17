@@ -1,6 +1,6 @@
 # SentinelWatch
 
-An intelligent endpoint behavior analysis and threat detection system designed for real-time security monitoring. Built for the GKS Smart Security program application.
+An intelligent endpoint behavior analysis and threat detection system designed for real-time security monitoring. A comprehensive cybersecurity project demonstrating expertise in endpoint protection, behavioral analysis, and machine learning-based threat detection.
 
 ![SentinelWatch Dashboard](frontend/assets/interface.png)
 
@@ -281,7 +281,7 @@ Potential improvements for production deployment:
 
 ## Credits & License
 
-**Author**: GKS Smart Security Applicant  
+**Author**: Cybersecurity Engineer & Developer  
 **Purpose**: Educational portfolio project for cybersecurity graduate studies  
 **License**: MIT License - See LICENSE file for details
 
@@ -298,4 +298,4 @@ For questions about this project:
 
 ---
 
-*Built with dedication for the Global Korea Scholarship Smart Security program.*
+*Built with dedication to advancing cybersecurity education and research.*

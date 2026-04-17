@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentinelWatch - Endpoint Security Monitor</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <nav class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <span class="logo-text">SentinelWatch</span>
+            </div>
+            
+            <div class="nav-section">
+                <a href="#dashboard" class="nav-item active" data-tab="dashboard">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    <span data-i18n="nav_dashboard">Dashboard</span>
+                </a>
+                <a href="#processes" class="nav-item" data-tab="processes">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                    <span data-i18n="nav_processes">Processes</span>
+                </a>
+                <a href="#network" class="nav-item" data-tab="network">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 1v6m0 6v6m4.22-10.22l4.24-4.24M6.34 17.66l-4.24 4.24M23 12h-6m-6 0H1m20.24 4.24l-4.24-4.24M6.34 6.34L2.1 2.1"/>
+                    </svg>
+                    <span data-i18n="nav_network">Network</span>
+                </a>
+                <a href="#events" class="nav-item" data-tab="events">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                        <line x1="12" y1="9" x2="12" y2="13"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <span data-i18n="nav_events">Security Events</span>
+                    <span class="badge" id="event-badge">0</span>
+                </a>
+                <a href="#alerts" class="nav-item" data-tab="alerts">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
+                    <span data-i18n="nav_alerts">Alerts</span>
+                    <span class="badge alert" id="alert-badge">0</span>
+                </a>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-header" data-i18n="section_tools">Tools</div>
+                <a href="#baseline" class="nav-item" data-tab="baseline">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 20v-6M6 20V10M18 20V4"/>
+                    </svg>
+                    <span data-i18n="nav_baseline">Baseline Training</span>
+                </a>
+                <a href="#simulation" class="nav-item" data-tab="simulation">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    <span data-i18n="nav_simulation">Threat Simulation</span>
+                </a>
+            </div>
+            
+            <div class="lang-switcher">
+                <button class="lang-btn active" data-lang="en">EN</button>
+                <button class="lang-btn" data-lang="ar">AR</button>
+                <button class="lang-btn" data-lang="ko">KO</button>
+            </div>
+            
+            <div class="connection-status">
+                <span class="status-dot" id="ws-status"></span>
+                <span class="status-text" id="ws-text">Disconnected</span>
+            </div>
+        </nav>
+        
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="breadcrumb">
+                    <span class="system-name">SentinelWatch</span>
+                    <span class="separator">/</span>
+                    <span class="current-page" id="current-page">Dashboard</span>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-secondary" id="refresh-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="23 4 23 10 17 10"/>
+                            <polyline points="1 20 1 14 7 14"/>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                        </svg>
+                        <span data-i18n="refresh">Refresh</span>
+                    </button>
+                    <button class="btn btn-primary" id="export-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        <span data-i18n="export">Export</span>
+                    </button>
+                </div>
+            </header>
+            
+            <div class="content-area">
+                <div class="tab-content active" id="dashboard">
+                    <div class="page-header">
+                        <h1 data-i18n="dashboard_title">Security Dashboard</h1>
+                        <p class="subtitle" data-i18n="dashboard_subtitle">Real-time endpoint monitoring and threat detection</p>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card critical">
+                            <div class="stat-header">
+                                <span class="stat-label" data-i18n="active_threats">Active Threats</span>
+                                <div class="stat-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="stat-threats">0</div>
+                            <div class="stat-trend" id="threat-trend">No active threats</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label" data-i18n="monitored_processes">Monitored Processes</span>
+                                <div class="stat-icon blue">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                        <line x1="8" y1="21" x2="16" y2="21"/>
+                                        <line x1="12" y1="17" x2="12" y2="21"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="stat-processes">0</div>
+                            <div class="stat-trend" data-i18n="processes_running">processes running</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label" data-i18n="network_connections">Network Connections</span>
+                                <div class="stat-icon green">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="3"/>
+                                        <path d="M12 1v6m0 6v6m4.22-10.22l4.24-4.24"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="stat-connections">0</div>
+                            <div class="stat-trend" id="conn-trend">Active connections</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-label" data-i18n="risk_score">Avg Risk Score</span>
+                                <div class="stat-icon orange">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="stat-value" id="stat-risk">0.0</div>
+                            <div class="stat-trend" data-i18n="baseline_status">Above baseline</div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-row">
+                        <div class="panel chart-panel">
+                            <div class="panel-header">
+                                <h3 data-i18n="threat_distribution">Threat Distribution</h3>
+                                <div class="panel-actions">
+                                    <span class="last-updated" id="chart-updated">Updated: Just now</span>
+                                </div>
+                            </div>
+                            <div class="panel-content">
+                                <canvas id="threat-chart"></canvas>
+                                <div class="chart-legend" id="threat-legend"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="panel activity-panel">
+                            <div class="panel-header">
+                                <h3 data-i18n="recent_activity">Recent Activity</h3>
+                                <div class="panel-actions">
+                                    <button class="btn btn-sm btn-text" id="view-all-events" data-i18n="view_all">View All</button>
+                                </div>
+                            </div>
+                            <div class="panel-content">
+                                <div class="activity-list" id="activity-list">
+                                    <div class="empty-state">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"/>
+                                            <line x1="12" y1="8" x2="12" y2="12"/>
+                                            <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                        </svg>
+                                        <p data-i18n="no_activity">No recent security events</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-row">
+                        <div class="panel system-panel">
+                            <div class="panel-header">
+                                <h3 data-i18n="system_resources">System Resources</h3>
+                            </div>
+                            <div class="panel-content">
+                                <div class="resource-bars">
+                                    <div class="resource-item">
+                                        <div class="resource-header">
+                                            <span class="resource-name">CPU</span>
+                                            <span class="resource-value" id="cpu-value">0%</span>
+                                        </div>
+                                        <div class="resource-bar">
+                                            <div class="resource-fill" id="cpu-bar"></div>
+                                        </div>
+                                    </div>
+                                    <div class="resource-item">
+                                        <div class="resource-header">
+                                            <span class="resource-name">Memory</span>
+                                            <span class="resource-value" id="mem-value">0%</span>
+                                        </div>
+                                        <div class="resource-bar">
+                                            <div class="resource-fill" id="mem-bar"></div>
+                                        </div>
+                                    </div>
+                                    <div class="resource-item">
+                                        <div class="resource-header">
+                                            <span class="resource-name">Disk</span>
+                                            <span class="resource-value" id="disk-value">0%</span>
+                                        </div>
+                                        <div class="resource-bar">
+                                            <div class="resource-fill" id="disk-bar"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="panel alerts-panel">
+                            <div class="panel-header">
+                                <h3 data-i18n="latest_alerts">Latest Alerts</h3>
+                            </div>
+                            <div class="panel-content">
+                                <div class="alerts-list" id="alerts-list">
+                                    <div class="empty-state">
+                                        <p data-i18n="no_alerts">No active alerts</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="processes">
+                    <div class="page-header">
+                        <h1 data-i18n="processes_title">Process Monitor</h1>
+                        <p class="subtitle" data-i18n="processes_subtitle">Active processes and behavioral analysis</p>
+                    </div>
+                    
+                    <div class="panel">
+                        <div class="panel-header with-filters">
+                            <div class="search-box">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"/>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                </svg>
+                                <input type="text" id="process-search" placeholder="Search processes..." data-i18n-placeholder="search_placeholder">
+                            </div>
+                            <div class="filters">
+                                <select id="process-filter">
+                                    <option value="all" data-i18n="filter_all">All Processes</option>
+                                    <option value="anomaly" data-i18n="filter_anomaly">Anomalies Only</option>
+                                    <option value="high-cpu" data-i18n="filter_high_cpu">High CPU</option>
+                                    <option value="network" data-i18n="filter_network">Network Active</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="panel-content">
+                            <table class="data-table" id="processes-table">
+                                <thead>
+                                    <tr>
+                                        <th data-i18n="col_pid">PID</th>
+                                        <th data-i18n="col_name">Name</th>
+                                        <th data-i18n="col_user">User</th>
+                                        <th data-i18n="col_cpu">CPU %</th>
+                                        <th data-i18n="col_memory">Memory</th>
+                                        <th data-i18n="col_connections">Connections</th>
+                                        <th data-i18n="col_status">Status</th>
+                                        <th data-i18n="col_risk">Risk</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="processes-tbody">
+                                    <tr class="loading-row">
+                                        <td colspan="8">
+                                            <div class="loading-spinner"></div>
+                                            <span data-i18n="loading">Loading processes...</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="network">
+                    <div class="page-header">
+                        <h1 data-i18n="network_title">Network Monitor</h1>
+                        <p class="subtitle" data-i18n="network_subtitle">Active connections and network activity</p>
+                    </div>
+                    
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3 data-i18n="active_connections">Active Connections</h3>
+                            <div class="panel-actions">
+                                <button class="btn btn-sm btn-secondary" id="refresh-connections">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="23 4 23 10 17 10"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="panel-content">
+                            <table class="data-table" id="network-table">
+                                <thead>
+                                    <tr>
+                                        <th data-i18n="col_local">Local Address</th>
+                                        <th data-i18n="col_remote">Remote Address</th>
+                                        <th data-i18n="col_protocol">Protocol</th>
+                                        <th data-i18n="col_process">Process</th>
+                                        <th data-i18n="col_status">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="network-tbody">
+                                    <tr class="loading-row">
+                                        <td colspan="5">
+                                            <div class="loading-spinner"></div>
+                                            <span data-i18n="loading">Loading connections...</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="events">
+                    <div class="page-header">
+                        <h1 data-i18n="events_title">Security Events</h1>
+                        <p class="subtitle" data-i18n="events_subtitle">Detected security incidents and anomalies</p>
+                    </div>
+                    
+                    <div class="panel">
+                        <div class="panel-header with-filters">
+                            <div class="filters-row">
+                                <select id="event-severity">
+                                    <option value="all">All Severities</option>
+                                    <option value="critical">Critical</option>
+                                    <option value="high">High</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="low">Low</option>
+                                </select>
+                                <select id="event-status">
+                                    <option value="all">All Status</option>
+                                    <option value="unresolved">Unresolved</option>
+                                    <option value="resolved">Resolved</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="panel-content">
+                            <div class="events-list" id="events-list">
+                                <div class="empty-state">
+                                    <p data-i18n="no_events">No security events recorded</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="alerts">
+                    <div class="page-header">
+                        <h1 data-i18n="alerts_title">Alert Center</h1>
+                        <p class="subtitle" data-i18n="alerts_subtitle">Security alerts and notifications</p>
+                    </div>
+                    
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3 data-i18n="active_alerts">Active Alerts</h3>
+                            <div class="panel-actions">
+                                <button class="btn btn-sm btn-secondary" id="ack-all-btn" data-i18n="ack_all">
+                                    Acknowledge All
+                                </button>
+                            </div>
+                        </div>
+                        <div class="panel-content">
+                            <div class="alerts-full-list" id="alerts-full-list"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="baseline">
+                    <div class="page-header">
+                        <h1 data-i18n="baseline_title">Baseline Training</h1>
+                        <p class="subtitle" data-i18n="baseline_subtitle">Train anomaly detection model on normal system behavior</p>
+                    </div>
+                    
+                    <div class="panel">
+                        <div class="panel-content centered">
+                            <div class="baseline-status" id="baseline-status">
+                                <div class="status-icon" id="baseline-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <line x1="12" y1="8" x2="12" y2="12"/>
+                                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                    </svg>
+                                </div>
+                                <h3 id="baseline-status-text">Baseline Not Trained</h3>
+                                <p class="baseline-desc" id="baseline-desc">
+                                    The system needs baseline data to detect anomalies. 
+                                    Run training during normal system operation to establish expected behavior patterns.
+                                </p>
+                                
+                                <div class="baseline-controls">
+                                    <div class="duration-selector">
+                                        <label data-i18n="training_duration">Training Duration</label>
+                                        <select id="train-duration">
+                                            <option value="60">1 minute (Demo)</option>
+                                            <option value="300">5 minutes</option>
+                                            <option value="600">10 minutes</option>
+                                            <option value="1800">30 minutes</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <button class="btn btn-primary btn-lg" id="start-training-btn">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polygon points="5 3 19 12 5 21 5 3"/>
+                                        </svg>
+                                        <span data-i18n="start_training">Start Training</span>
+                                    </button>
+                                </div>
+                                
+                                <div class="training-progress hidden" id="training-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="train-progress-fill"></div>
+                                    </div>
+                                    <span class="progress-text" id="train-progress-text">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="simulation">
+                    <div class="page-header">
+                        <h1 data-i18n="simulation_title">Threat Simulation</h1>
+                        <p class="subtitle" data-i18n="simulation_subtitle">Simulate threats for testing detection capabilities</p>
+                    </div>
+                    
+                    <div class="panel warning-panel">
+                        <div class="panel-content">
+                            <div class="warning-box">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                    <line x1="12" y1="9" x2="12" y2="13"/>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                                </svg>
+                                <div class="warning-content">
+                                    <h4 data-i18n="simulation_warning_title">Educational Purpose Only</h4>
+                                    <p data-i18n="simulation_warning_text">
+                                        These simulations generate synthetic threat data for educational and testing purposes. 
+                                        No actual malicious code is executed on your system.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="simulation-grid">
+                        <div class="sim-card" data-threat="ransomware_sim">
+                            <div class="sim-icon ransomware">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                </svg>
+                            </div>
+                            <h4 data-i18n="sim_ransomware">Ransomware Behavior</h4>
+                            <p data-i18n="sim_ransomware_desc">Simulates file encryption patterns and ransom note creation</p>
+                            <button class="btn btn-danger" data-i18n="simulate">Simulate</button>
+                        </div>
+                        
+                        <div class="sim-card" data-threat="backdoor_sim">
+                            <div class="sim-icon backdoor">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                                    <polyline points="16 17 21 12 16 7"/>
+                                    <line x1="21" y1="12" x2="9" y2="12"/>
+                                </svg>
+                            </div>
+                            <h4 data-i18n="sim_backdoor">Backdoor Connection</h4>
+                            <p data-i18n="sim_backdoor_desc">Simulates C2 communication and encoded commands</p>
+                            <button class="btn btn-danger" data-i18n="simulate">Simulate</button>
+                        </div>
+                        
+                        <div class="sim-card" data-threat="trojan_sim">
+                            <div class="sim-icon trojan">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                </svg>
+                            </div>
+                            <h4 data-i18n="sim_trojan">Trojan Injection</h4>
+                            <p data-i18n="sim_trojan_desc">Simulates process injection and malicious DLL loading</p>
+                            <button class="btn btn-danger" data-i18n="simulate">Simulate</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="modal" id="event-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Event Details</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-footer" id="modal-footer"></div>
+        </div>
+    </div>
+    
+    <div class="toast-container" id="toast-container"></div>
+    
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/charts.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
